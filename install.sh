@@ -2,19 +2,19 @@
 
 echo 'checking if yay is installed'
 
-[ -f /usr/bin/yay ] || ./.scripts/yay.sh
+[ -f /usr/bin/yay ] || sh .scripts/yay.sh
 
 echo 'installing packages'
 
-[ -f /usr/bin/yay ] && yay -S - < .packages.txt
+[ -f /usr/bin/yay ] && yay -S --noconfirm - < .packages.txt
 
 echo 'configuring lightdm'
 
-[ -f /usr/bin/lightdm ] && ./.scripts/lightdm.sh
+[ -f /usr/bin/lightdm ] && sh .scripts/lightdm.sh || echo lightdm not installed
 
 echo 'configuring window manager'
 
-[ -f /usr/bin/bspwm ] && ./.scripts/bspwm.sh
+[ -f /usr/bin/bspwm ] && sh .scripts/bspwm.sh || echo bspwm not installed
 
 echo 'rebooting'
 
