@@ -41,11 +41,9 @@ thunar-media-tags-plugin
 thunar-volman
 tumbler
 xclip
-xcursor-neutral
 xdg-user-dirs-gtk
 xorg
-xorg-xbindkeys
-xorg-xclip
+xbindkeys
 xorg-xdpyinfo
 xorg-xed
 xorg-xev
