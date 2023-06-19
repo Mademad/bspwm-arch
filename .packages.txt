@@ -45,7 +45,6 @@ xdg-user-dirs-gtk
 xorg
 xbindkeys
 xorg-xdpyinfo
-xorg-xed
 xorg-xev
 xorg-xinit
 xorg-xinput
