@@ -1,5 +1,7 @@
 ## My BSPWM Configs
 
+## For Fresh Installs
+
 Download ArchISO from [ArchISO](https://archlinux.org/download/)
 <https://archlinux.org/download/>
 
