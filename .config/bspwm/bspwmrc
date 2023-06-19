@@ -10,8 +10,8 @@ xrandr --output HDMI-0 --mode 1920x1080 --rate 60
 #Autostart#
 ###########
 pgrep -x sxhkd > /dev/null || sxhkd &
-sh ~/.screenlayout/monitor.sh &
-picom --vsync &
+xsetroot -cursor_name left_ptr
+#picom &
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 feh --bg-fill --randomize ~/Pictures/wallpapers/* &
 ~/.config/polybar/launch.sh &
@@ -32,13 +32,18 @@ bspc config gapless_monocle      true
 
 bspc rule -a Gimp desktop=^8 state=floating follow=on
 bspc rule -a Brave-browser desktop=^2 focus=on
-bspc rule -a krusader desktop=^3 follow=on
+bspc rule -a Thunar desktop=^3 follow=on
 bspc rule -a Audacious desktop=^4 follow=on
 bspc rule -a mpv desktop=^4 focus=on follow=on
 bspc rule -a discord desktop=^7 follow=on
 
 bspc rule -a Lutris desktop=^5 follow=on
-#bspc rule -a metroexodus.exe desktop=^6 state=fullscreen focus=on follow=on
+bspc rule -a rdr2.exe desktop=^6 state=fullscreen focus=on follow=on
+bspc rule -a farcry6.exe desktop=^6 state=fullscreen focus=on follow=on
+bspc rule -a metroexodus.exe desktop=^6 state=fullscreen focus=on follow=on
+bspc rule -a anomalydx11avx.exe desktop=^6 state=fullscreen focus=on follow=on
+bspc rule -a systemreshock-win64-shipping.exe desktop=^6 state=fullscreen focus=on follow=on
+bspc rule -a aplaguetaleinnocence_x64.exe desktop=^6 state=fullscreen focus=on follow=on
 
 bspc rule -a Screenkey manage=off
 bspc rule -a xdman-Main state=floating

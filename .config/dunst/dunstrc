@@ -3,7 +3,7 @@
   follow = mouse
   width = 350
   height = 350
-  offset = 3x30
+  offset = 5x30
   origin = top-right
   shrink = no
   padding = 20

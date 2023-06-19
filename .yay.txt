@@ -1,0 +1,8 @@
+brave-bin
+breeze-hacked-cursor-theme
+otf-font-awesome
+ttf-font-awesome
+xdman
+zsh
+zsh-autosuggestions
+zsh-syntax-highlighting

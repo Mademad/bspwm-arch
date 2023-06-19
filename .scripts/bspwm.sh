@@ -16,4 +16,4 @@ echo 'backing up old config files if detected'
 
 echo 'copying config files'
 
-cp -r .config/* $HOME/.config/
+cp -rf .config/* $HOME/.config/
