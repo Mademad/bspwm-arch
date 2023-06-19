@@ -11,7 +11,8 @@ xrandr --output HDMI-0 --mode 1920x1080 --rate 60
 ###########
 pgrep -x sxhkd > /dev/null || sxhkd &
 xsetroot -cursor_name left_ptr
-#picom &
+xclip &
+picom &
 /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1 &
 feh --bg-fill --randomize ~/Pictures/wallpapers/* &
 ~/.config/polybar/launch.sh &
