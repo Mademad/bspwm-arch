@@ -1,5 +1,4 @@
 alacritty
-arandr
 archlinux-xdg-menu
 audacious
 base-devel
@@ -8,7 +7,7 @@ dunst
 feh
 file-roller
 freerdp
-git
+grub
 gtk2
 gtk3
 gtk4
@@ -22,6 +21,7 @@ lightdm
 lightdm-slick-greeter
 lxappearance-gtk3
 mpv
+nano
 networkmanager
 network-manager-applet
 ntfs-3g

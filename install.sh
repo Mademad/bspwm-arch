@@ -1,12 +1,12 @@
 #!/bin/sh
 
-echo echo 'installing packages'
+echo 'installing packages'
 
 sudo pacman -Syu --noconfirm - < .packages.txt
 
 echo 'checking if yay is installed'
 
-[ -f /usr/bin/yay ] || sh .scripts/yay.sh
+[ -f /usr/bin/yay ] || bash .scripts/yay.sh
 
 echo 'installing packages from aur'
  
@@ -14,15 +14,15 @@ yay -S --noconfirm - < .yay.txt
 
 echo 'configuring lightdm'
 
-[ -f /usr/bin/lightdm ] && sh .scripts/lightdm.sh || echo lightdm not installed
+[ -f /usr/bin/lightdm ] && bash .scripts/lightdm.sh || echo lightdm not installed
 
 echo 'configuring window manager'
 
-[ -f /usr/bin/bspwm ] && sh .scripts/bspwm.sh || echo bspwm not installed
+[ -f /usr/bin/bspwm ] && bash .scripts/bspwm.sh || echo bspwm not installed
 
 echo 'configuring theme'
 
-sh .scripts/theme.sh
+bash .scripts/theme.sh
 
 echo 'rebooting'
 
