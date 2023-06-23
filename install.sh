@@ -72,9 +72,9 @@ set-password() {
 }
 
 runas-user() {
-    mkdir "$DIR_S"
-    cp -r ./* "$DIR_S/"
-    su -c "bash $DIR_S/install.sh"
+    mkdir $DIR_S
+    cp -r ./* $DIR_S/
+    su -c bash $DIR_S/install.sh
 }
 
 ################
