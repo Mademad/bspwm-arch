@@ -14,6 +14,7 @@ PACFILE=.packages.txt
 YAYFILE=.yay.txt
 USER_CONF=$HOME/.config
 GTK3=/usr/share/gtk-3.0/settings.ini
+SCRIPT=$DIR_S/install.sh
 set +a
 ###########
 #Functions#
@@ -74,7 +75,7 @@ set-password() {
 runas-user() {
     mkdir $DIR_S
     cp -r ./* $DIR_S/
-    su -c bash $DIR_S/install.sh
+    su -c /bin/bash $SCRIPT
 }
 
 ################
