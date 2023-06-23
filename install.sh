@@ -78,7 +78,7 @@ runas-user() {
     mkdir $DIR_S
     cp -r ./* $DIR_S/
     chmod +x $SCRIPT
-    su -c /bin/bash $SCRIPT
+    su - $USERNAME -c "/bin/bash $SCRIPT"
 }
 
 ################
@@ -96,7 +96,7 @@ install-yay() {
 
 install-pacs() {
     echo 'installing packages'
-    echo '$PASSWORD1' | sudo -S pacman -Syu --noconfirm --needed - < $PACFILE
+    echo "$PASSWORD1" | sudo -S pacman -Syu --noconfirm --needed - < $PACFILE
     yay -S --noconfirm - < $YAYFILE
 }
 
@@ -117,10 +117,10 @@ conf-wm() {
 conf-theme() {
     echo 'Configuring Theme'
     if [[ -f $GTK3 ]]; then 
-        echo '$PASSWORD' | sudo -S sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
-        echo '$PASSWORD' | sudo -S sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
-        echo '$PASSWORD' | sudo -S sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
-        echo '$PASSWORD' | sudo -S sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
+        echo "$PASSWORD1" | sudo -S sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
+        echo "$PASSWORD1" | sudo -S sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
+        echo "$PASSWORD1" | sudo -S sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
+        echo "$PASSWORD1" | sudo -S sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
     fi
     echo 'Xcursor.theme: Breeze-Hacked' >> ~/.Xresources
     xrdb ~/.Xresources
@@ -129,10 +129,10 @@ conf-theme() {
 conf-dm() {
     echo 'Configuring Display Manager'
     echo 'editing config file'
-    echo '$PASSWORD' | sudo -S sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
-    echo '$PASSWORD' | sudo -S sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
+    echo "$PASSWORD1" | sudo -S sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
+    echo "$PASSWORD1" | sudo -S sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
     echo 'Enabling Display Manager'
-    echo '$PASSWORD' | sudo -S systemctl enable --now lightdm
+    echo "$PASSWORD1" | sudo -S systemctl enable --now lightdm
 }
 
 restart() {
@@ -142,10 +142,11 @@ restart() {
 
 main() {
     if [[ -f /usr/bin/yay ]]; then
-        install-yay
         install-pacs
     else
         echo 'yay is not installed'
+        install-yay
+        main
     fi
     conf-dm
     conf-theme
