@@ -70,7 +70,7 @@ set-password() {
 }
 
 runas-user() {
-    cp -rf ./*.* $DIR_S/
+    cp -rf *.* $DIR_S/
     chmod +x $SCRIPT
     su - $USERNAME -c "/bin/bash $SCRIPT"
 }
