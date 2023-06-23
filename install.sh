@@ -13,6 +13,7 @@ YAY_DIR='yay-git'
 PACFILE='.packages.txt'
 YAYFILE='.yay.txt'
 USER_CONF=$HOME/.config
+GTK3=/usr/share/gtk-3.0/settings.ini
 set +a
 ###########
 #Functions#
@@ -62,6 +63,7 @@ get-password() {
         echo -ne "ERROR! Passwords do not match. \n"
         get-password
     fi
+}
 
 set-password() {
     echo "$USERNAME:$PASSWORD1" | chpasswd
@@ -108,7 +110,7 @@ conf-wm() {
 
 conf-theme() {
     echo 'Configuring Theme'
-    if [[ -f /usr/share/gtk-3.0/settings.ini ]]; then 
+    if [[ -f $GTK3 ]]; then 
         echo '$PASSWORD' | sudo -S sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
         echo '$PASSWORD' | sudo -S sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
         echo '$PASSWORD' | sudo -S sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
