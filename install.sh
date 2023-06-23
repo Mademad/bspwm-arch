@@ -55,7 +55,7 @@ get-password() {
     read -rs -p "Please re-enter password: " PASSWORD2
     echo -ne "\n"
     if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
-        echo "PASSWORD=$PASSWORD1" >> config.txt
+        echo "PASSWORD1=$PASSWORD1" >> config.txt
     else
         echo -ne "ERROR! Passwords do not match. \n"
         get-password
@@ -76,7 +76,7 @@ runas-user() {
 ################
 
 install-yay() {
-    echo ' installing yay'
+    echo 'Installing yay'
     git clone $YAY_LINK
     cd $YAY_DIR
     makepkg -si --noconfirm
@@ -107,15 +107,10 @@ conf-wm() {
 conf-theme() {
     echo 'Configuring Theme'
     if [ -f /usr/share/gtk-3.0/settings.ini ]; then 
-        sudo sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
-        sudo sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
-        sudo sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
-        sudo sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
-    else
-        echo 'gtk-theme-name = Layan-Dark' >> /usr/share/gtk-3.0/settings.ini
-        echo 'gtk-icon-theme-name = Adwaita' >> /usr/share/gtk-3.0/settings.ini
-        echo 'gtk-cursor-theme-name = Breeze-Hacked' >> /usr/share/gtk-3.0/settings.ini
-        echo 'gtk-font-name = Cantarell 11' >> /usr/share/gtk-3.0/settings.ini
+        echo '$PASSWORD' | sudo -S sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
+        echo '$PASSWORD' | sudo -S sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
+        echo '$PASSWORD' | sudo -S sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
+        echo '$PASSWORD' | sudo -S sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
     fi
     echo 'Xcursor.theme: Breeze-Hacked' >> ~/.Xresources
     xrdb ~/.Xresources
@@ -124,9 +119,9 @@ conf-theme() {
 conf-dm() {
     echo 'Configuring Display Manager'
     echo 'editing config file'
-    sudo sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
-    sudo sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
-    echo 'enabling lightdm'
+    echo '$PASSWORD' | sudo -S sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
+    echo '$PASSWORD' | sudo -S sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
+    echo 'Enabling Display Manager'
     echo '$PASSWORD' | sudo -S systemctl enable --now lightdm
 }
 
