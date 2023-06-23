@@ -4,16 +4,16 @@
 #Variables#
 ###########
 set -a
-SUDOERS='/etc/sudoers'
-SUDOERS_TMP='/tmp/sudoers.tmp'
-DIR_S="/home/$USERNAME/bspwm-arch"
-CONFIG_FILE="$DIR_S/config.txt"
-YAY_LINK='https://aur.archlinux.org/yay-git.git'
-YAY_DIR='yay-git'
-PACFILE='.packages.txt'
-YAYFILE='.yay.txt'
-USER_CONF="$HOME/.config"
-GTK3='/usr/share/gtk-3.0/settings.ini'
+SUDOERS=/etc/sudoers
+SUDOERS_TMP=/tmp/sudoers.tmp
+DIR_S=/home/$USERNAME/bspwm-arch
+CONFIG_FILE=/home/$USERNAME/bspwm-arch/config.txt
+YAY_LINK=https://aur.archlinux.org/yay-git.git
+YAY_DIR=yay-git
+PACFILE=.packages.txt
+YAYFILE=.yay.txt
+USER_CONF=$HOME/.config
+GTK3=/usr/share/gtk-3.0/settings.ini
 set +a
 ###########
 #Functions#
@@ -34,13 +34,14 @@ check-conf() {
         source $CONFIG_FILE
     else
         get-user
+        get-password
+        start
     fi
 }
 
 get-user() {
     USERNAME=$(whoami)
     echo 'USERNAME=$USERNAME' >> config.txt
-    get-password
 }
 
 get-password() {
@@ -72,7 +73,7 @@ set-password() {
 
 runas-user() {
     mkdir "$DIR_S"
-    cp -r ./* "$DIR_S"
+    cp -r ./* "$DIR_S/"
     su -c "bash $DIR_S/install.sh"
 }
 
@@ -160,4 +161,5 @@ else
     main
 fi
 }
+get-user
 start
