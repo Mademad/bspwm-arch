@@ -147,7 +147,7 @@ main() {
 #Commands#
 ##########
 
-if [ &(whoami) == root ]; then
+if [[ &(whoami) == root ]]; then
     sudo-access
     create-user
     runas-user
