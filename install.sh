@@ -50,6 +50,8 @@ userhome-var() {
     DIR_S=/home/$USERNAME/bspwm-arch
     CONFIG_FILE=/home/$USERNAME/bspwm-arch/.config.tmp
     SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
+    PACS=/home/$USERNAME/bspwm-arch/.packages.txt
+    YAYS=/home/$USERNAME/bspwm-arch/.yay.txt
 }
 
 get-password() {
@@ -70,7 +72,11 @@ set-password() {
 }
 
 runas-user() {
-    cp -rf *.* $DIR_S/
+    mkdir $DIR_S/.config
+    cp -rf ./* $DIR_S/
+    cp -rf .packages.txt $PACS
+    cp -rf .yay.txt $YAYS
+    cp -rf .config/* $DIR_S/.config/
     chmod +x $SCRIPT
     su - $USERNAME -c "/bin/bash $SCRIPT"
 }
@@ -90,8 +96,8 @@ install-yay() {
 
 install-pacs() {
     echo 'Installing Packages'
-    echo "$PASSWORD" | sudo -S pacman -Syu --noconfirm --needed - < $DIR_S/.packages.txt
-    yay -S --noconfirm - < $DIR_S/.yay.txt
+    echo "$PASSWORD" | sudo -S pacman -Syu --noconfirm --needed - < $PACS
+    yay -S --noconfirm - < $YAYS
 }
 
 conf-wm() {
