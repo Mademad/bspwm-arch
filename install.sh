@@ -37,10 +37,24 @@ check-conf() {
 
 get-user() {
     USERNAME=$(whoami)
+    echo 'USERNAME=$USERNAME' >> config.txt
+    userhome-var
+}
+
+create-user() {
+    read -rs -p "Enter Your Username: " USERNAME
+    echo -ne "\n"
+    useradd -mG wheel -s /bin/bash $USERNAME
+    echo "USERNAME=$USERNAME" >> config.txt
+    get-password
+    set-password
+    userhome-var
+}
+
+userhome-var() {
     DIR_S=/home/$USERNAME/bspwm-arch
     CONFIG_FILE=/home/$USERNAME/bspwm-arch/config.txt
     SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
-    echo 'USERNAME=$USERNAME' >> config.txt
 }
 
 get-password() {
@@ -54,16 +68,6 @@ get-password() {
         echo -ne "ERROR! Passwords do not match. \n"
         get-password
     fi
-}
-
-create-user() {
-    read -rs -p "Enter Your Username: " USERNAME
-    echo -ne "\n"
-    useradd -mG wheel -s /bin/bash $USERNAME
-    echo "USERNAME=$USERNAME" >> config.txt
-    get-password
-    set-password
-
 }
 
 set-password() {
@@ -157,9 +161,9 @@ if [[ $(whoami) == 'root' ]]; then
     runas-user
 else
     echo 'Username=$USERNAME'
+    get-user
     check-conf
     main
 fi
 }
-get-user
 start
