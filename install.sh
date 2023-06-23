@@ -6,14 +6,14 @@
 set -a
 SUDOERS='/etc/sudoers'
 SUDOERS_TMP='/tmp/sudoers.tmp'
-DIR_S='/home/$USERNAME/bspwm-arch'
-CONFIG_FILE='$DIR_S/config.txt'
+DIR_S="/home/$USERNAME/bspwm-arch"
+CONFIG_FILE="$DIR_S/config.txt"
 YAY_LINK='https://aur.archlinux.org/yay-git.git'
 YAY_DIR='yay-git'
 PACFILE='.packages.txt'
 YAYFILE='.yay.txt'
-USER_CONF=$HOME/.config
-GTK3=/usr/share/gtk-3.0/settings.ini
+USER_CONF="$HOME/.config"
+GTK3='/usr/share/gtk-3.0/settings.ini'
 set +a
 ###########
 #Functions#
@@ -43,15 +43,6 @@ get-user() {
     get-password
 }
 
-create-user() {
-    read -rs -p "Enter Your Username: " USERNAME
-    echo -ne "\n"
-    useradd -mG wheel -s /bin/bash $USERNAME
-    echo "USERNAME=$USERNAME" >> config.txt
-    get-password
-    set-password
-}
-
 get-password() {
     read -rs -p "Please enter password: " PASSWORD1
     echo -ne "\n"
@@ -63,6 +54,16 @@ get-password() {
         echo -ne "ERROR! Passwords do not match. \n"
         get-password
     fi
+}
+
+create-user() {
+    read -rs -p "Enter Your Username: " USERNAME
+    echo -ne "\n"
+    useradd -mG wheel -s /bin/bash $USERNAME
+    echo "USERNAME=$USERNAME" >> config.txt
+    get-password
+    set-password
+
 }
 
 set-password() {
@@ -147,10 +148,7 @@ main() {
     restart
 }
 
-##########
-#Commands#
-##########
-
+start() {
 if [[ $(whoami) == 'root' ]]; then
     echo 'Username=root'
     sudo-access
@@ -161,3 +159,5 @@ else
     check-conf
     main
 fi
+}
+start
