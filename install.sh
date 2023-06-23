@@ -1,4 +1,4 @@
-#!/bin/bash 
+#!/usr/bin/env bash 
 
 ###########
 #Variables#
@@ -12,6 +12,20 @@ GTK3=/usr/share/gtk-3.0/settings.ini
 ###########
 #Functions#
 ###########
+set_option() {
+    if grep -Eq "^${1}.*" $CONFIG_FILE; then # check if option exists
+        sed -i -e "/^${1}.*/d" $CONFIG_FILE # delete option if exists
+    fi
+    echo "${1}=${2}" >>$CONFIG_FILE # add option
+}
+
+userhome-var() {
+    DIR_S=/home/$USERNAME/bspwm-arch
+    CONFIG_FILE=/home/$USERNAME/bspwm-arch/setup.conf
+    SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
+    PACS=/home/$USERNAME/bspwm-arch/packages.txt
+    YAYS=/home/$USERNAME/bspwm-arch/yay.txt
+}
 ################
 #Functions-User#
 ################
@@ -47,21 +61,13 @@ create-user() {
     echo "USERNAME=$USERNAME" >> $CONFIG_FILE
 }
 
-userhome-var() {
-    DIR_S=/home/$USERNAME/bspwm-arch
-    CONFIG_FILE=/home/$USERNAME/bspwm-arch/.config.tmp
-    SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
-    PACS=/home/$USERNAME/bspwm-arch/.packages.txt
-    YAYS=/home/$USERNAME/bspwm-arch/.yay.txt
-}
-
 get-password() {
-    read -rs -p "Please enter password: " PASSWORD
+    read -rs -p "Please enter password: " PASSWORD1
     echo -ne "\n"
     read -rs -p "Please re-enter password: " PASSWORD2
     echo -ne "\n"
-    if [[ "$PASSWORD" == "$PASSWORD2" ]]; then
-        echo "PASSWORD=$PASSWORD" >> $CONFIG_FILE
+    if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
+        echo ""PASSWORD=$PASSWORD1"" >> $CONFIG_FILE
     else
         echo -ne "ERROR! Passwords do not match. \n"
         get-password
@@ -69,17 +75,15 @@ get-password() {
 }
 
 set-password() {
-    echo "$USERNAME:$PASSWORD" | chpasswd
+    echo "$USERNAME:$PASSWORD1" | chpasswd
 }
 
 runas-user() {
     mkdir $DIR_S/.config
     cp -rf ./* $DIR_S/
-    cp -rf .packages.txt $PACS
-    cp -rf .yay.txt $YAYS
     cp -rf .config/* $DIR_S/.config/
     chmod +x $SCRIPT
-    su - $USERNAME -c "/bin/bash $SCRIPT"
+    su $USERNAME -c "bash $SCRIPT"
 }
 
 ################
