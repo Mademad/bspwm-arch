@@ -147,15 +147,13 @@ main() {
 #Commands#
 ##########
 
-if [[ $(whoami) == root ]]; then
+if [ $(whoami) == root ]; then
+    echo 'Username=root'
     sudo-access
     create-user
     runas-user
 else
+    echo 'Username=$USERNAME'
     check-conf
     main
 fi
-
-########
-#TheEnd#
-########
