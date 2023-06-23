@@ -7,8 +7,6 @@ SUDOERS=/etc/sudoers
 SUDOERS_TMP=/tmp/sudoers.tmp
 YAY_LINK=https://aur.archlinux.org/yay-git.git
 YAY_DIR=yay-git
-PACFILE='.packages.txt'
-YAYFILE='.yay.txt'
 USER_CONF=$HOME/.config
 GTK3=/usr/share/gtk-3.0/settings.ini
 ###########
@@ -94,8 +92,8 @@ install-yay() {
 
 install-pacs() {
     echo 'Installing Packages'
-    echo "$PASSWORD" | sudo -S pacman -Syu --noconfirm --needed - < $PACFILE
-    yay -S --noconfirm - < $YAYFILE
+    echo "$PASSWORD" | sudo -S pacman -Syu --noconfirm --needed - < $DIR_S/.packages.txt
+    yay -S --noconfirm - < $DIR_S/.yay.txt
 }
 
 conf-wm() {
