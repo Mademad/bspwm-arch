@@ -7,8 +7,8 @@ SUDOERS=/etc/sudoers
 SUDOERS_TMP=/tmp/sudoers.tmp
 YAY_LINK=https://aur.archlinux.org/yay-git.git
 YAY_DIR=yay-git
-PACFILE=.packages.txt
-YAYFILE=.yay.txt
+PACFILE='.packages.txt'
+YAYFILE='.yay.txt'
 USER_CONF=$HOME/.config
 GTK3=/usr/share/gtk-3.0/settings.ini
 ###########
@@ -37,7 +37,6 @@ check-conf() {
 
 get-user() {
     USERNAME=$(whoami)
-    echo 'USERNAME=$USERNAME' >> config.txt
     userhome-var
 }
 
@@ -45,9 +44,6 @@ create-user() {
     read -rs -p "Enter Your Username: " USERNAME
     echo -ne "\n"
     useradd -mG wheel -s /bin/bash $USERNAME
-    echo "USERNAME=$USERNAME" >> config.txt
-    get-password
-    set-password
     userhome-var
 }
 
@@ -55,15 +51,16 @@ userhome-var() {
     DIR_S=/home/$USERNAME/bspwm-arch
     CONFIG_FILE=/home/$USERNAME/bspwm-arch/config.txt
     SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
+    echo "USERNAME=$USERNAME" >> $CONFIG_FILE
 }
 
 get-password() {
-    read -rs -p "Please enter password: " PASSWORD1
+    read -rs -p "Please enter password: " PASSWORD
     echo -ne "\n"
     read -rs -p "Please re-enter password: " PASSWORD2
     echo -ne "\n"
-    if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
-        echo "PASSWORD1=$PASSWORD1" >> config.txt
+    if [[ "$PASSWORD" == "$PASSWORD2" ]]; then
+        echo "PASSWORD=$PASSWORD" >> $CONFIG_FILE
     else
         echo -ne "ERROR! Passwords do not match. \n"
         get-password
@@ -71,7 +68,7 @@ get-password() {
 }
 
 set-password() {
-    echo "$USERNAME:$PASSWORD1" | chpasswd
+    echo "$USERNAME:$PASSWORD" | chpasswd
 }
 
 runas-user() {
@@ -95,8 +92,8 @@ install-yay() {
 }
 
 install-pacs() {
-    echo 'installing packages'
-    echo "$PASSWORD1" | sudo -S pacman -Syu --noconfirm --needed - < $PACFILE
+    echo 'Installing Packages'
+    echo "$PASSWORD" | sudo -S pacman -Syu --noconfirm --needed - < $PACFILE
     yay -S --noconfirm - < $YAYFILE
 }
 
@@ -117,10 +114,10 @@ conf-wm() {
 conf-theme() {
     echo 'Configuring Theme'
     if [[ -f $GTK3 ]]; then 
-        echo "$PASSWORD1" | sudo -S sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
-        echo "$PASSWORD1" | sudo -S sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
-        echo "$PASSWORD1" | sudo -S sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
-        echo "$PASSWORD1" | sudo -S sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
+        echo "$PASSWORD" | sudo -S sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
+        echo "$PASSWORD" | sudo -S sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
+        echo "$PASSWORD" | sudo -S sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
+        echo "$PASSWORD" | sudo -S sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
     fi
     echo 'Xcursor.theme: Breeze-Hacked' >> ~/.Xresources
     xrdb ~/.Xresources
@@ -129,10 +126,10 @@ conf-theme() {
 conf-dm() {
     echo 'Configuring Display Manager'
     echo 'editing config file'
-    echo "$PASSWORD1" | sudo -S sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
-    echo "$PASSWORD1" | sudo -S sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
+    echo "$PASSWORD" | sudo -S sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
+    echo "$PASSWORD" | sudo -S sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
     echo 'Enabling Display Manager'
-    echo "$PASSWORD1" | sudo -S systemctl enable --now lightdm
+    echo "$PASSWORD" | sudo -S systemctl enable --now lightdm
 }
 
 restart() {
@@ -159,10 +156,13 @@ if [[ $(whoami) == 'root' ]]; then
     echo 'Username=root'
     sudo-access
     create-user
+    get-password
+    set-password
     runas-user
 else
-    echo 'Username=$USERNAME'
     get-user
+    get-password
+    echo "Username=$USERNAME"
     check-conf
     main
 fi
