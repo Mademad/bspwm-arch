@@ -75,6 +75,7 @@ runas-user() {
     mkdir $DIR_S
     cp -r ./* $DIR_S/
     chmod +x $SCRIPT
+    chown $USERNAME: /home/$USERNAME
     su - $USERNAME -c "/bin/bash $SCRIPT"
 }
 
