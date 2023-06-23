@@ -27,6 +27,7 @@ check-conf() {
     if [[ -f $CONFIG_FILE ]]; then
         source $CONFIG_FILE
     else
+        get-user
         get-password
         start
     fi
@@ -163,9 +164,10 @@ if [[ $(whoami) == 'root' ]]; then
     set-password
     runas-user
 else
-    get-user
-    echo "Username=$USERNAME"
+    USERNAME=$(whoami)
+    userhome-var
     check-conf
+    echo "Username=$USERNAME"
     main
 fi
 }
