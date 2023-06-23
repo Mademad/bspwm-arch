@@ -155,4 +155,7 @@ else
     check-conf
     main
 fi
-EOF
+
+########
+#TheEnd#
+########
