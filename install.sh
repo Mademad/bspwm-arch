@@ -1,29 +1,162 @@
-#!/bin/sh
+#!/bin/sh 
 
-echo 'installing packages'
+###########
+#Variables#
+###########
+SUDOERS='/etc/sudoers'
+SUDOERS_TMP='/tmp/sudoers.tmp'
+DIR_S='/home/$USERNAME/bspwm-arch'
+CONFIG_FILE='$DIR_S/config.txt'
+YAY_LINK='https://aur.archlinux.org/yay-git.git'
+YAY_DIR='yay-git'
+PACFILE='.packages.txt'
+YAYFILE='.yay.txt'
+USER_CONF=$HOME/.config
+###########
+#Functions#
+###########
+################
+#Functions-User#
+################
+sudo-access() {
+    echo 'Editing /etc/sudoers For User (root) Access'
+    cp $SUDOERS $SUDOERS_TMP
+    sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' $SUDOERS_TMP
+    cp $SUDOERS_TMP $SUDOERS
+    rm $SUDOERS_TMP
+}
 
-sudo pacman -Syu --noconfirm - < .packages.txt
+check-conf() {
+    if [ -f $CONFIG_FILE ]; then
+        source $CONFIG_FILE
+    else
+        get-user
+    fi
+}
 
-echo 'checking if yay is installed'
+get-user() {
+    USERNAME=$(whoami)
+    echo 'USERNAME=$USERNAME' >> config.txt
+    get-password
+}
 
-[ -f /usr/bin/yay ] || bash .scripts/yay.sh
+create-user() {
+    read -rs -p "Enter Your Username: " USERNAME
+    echo -ne "\n"
+    useradd -mG wheel $USERNAME
+    echo "USERNAME=$USERNAME" >> config.txt
+    get-password
+    set-password
+}
 
-echo 'installing packages from aur'
- 
-yay -S --noconfirm - < .yay.txt
+get-password() {
+    read -rs -p "Please enter password: " PASSWORD1
+    echo -ne "\n"
+    read -rs -p "Please re-enter password: " PASSWORD2
+    echo -ne "\n"
+    if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
+        echo "PASSWORD=$PASSWORD1" >> config.txt
+    else
+        echo -ne "ERROR! Passwords do not match. \n"
+        get-password
+    fi
 
-echo 'configuring lightdm'
+set-password() {
+    echo "$USERNAME:$PASSWORD1" | chpasswd
+}
 
-[ -f /usr/bin/lightdm ] && bash .scripts/lightdm.sh || echo lightdm not installed
+runas-user() {
+    mkdir $DIR_S
+    cp -r ./* $DIR_S
+    su -c 'bash $DIR_S/install.sh'
+}
 
-echo 'configuring window manager'
+################
+#Functions-Main#
+################
 
-[ -f /usr/bin/bspwm ] && bash .scripts/bspwm.sh || echo bspwm not installed
+install-yay() {
+    echo ' installing yay'
+    git clone $YAY_LINK
+    cd $YAY_DIR
+    makepkg -si --noconfirm
+    sleep 1 && cd ..
+    rm -rf yay-git
+}
 
-echo 'configuring theme'
+install-pacs() {
+    echo 'installing packages'
+    echo '$PASSWORD1' | sudo -S pacman -Syu --noconfirm --needed - < $PACFILE
+    yay -S --noconfirm - < $YAYFILE
+}
 
-bash .scripts/theme.sh
+conf-wm() {
+    echo 'Configuring Window Manager'
+    echo -ne "\n"
+    echo 'backing up old config files if detected'
+    [ -d $USER_CONF ] || mkdir $USER_CONF
+    [ -d $USER_CONF/alacritty ] && mv $USER_CONF/alacritty $USER_CONF/alacritty.old || mkdir $USER_CONF/alacritty
+    [ -d $USER_CONF/bspwm ] && mv $USER_CONF/bspwm $USER_CONF/bspwm.old || mkdir $USER_CONF/bspwm
+    [ -d $USER_CONF/sxhkd ] && mv $USER_CONF/sxhkd $USER_CONF/sxhkd.old || mkdir $USER_CONF/sxhkd
+    [ -d $USER_CONF/polybar ] && mv $USER_CONF/polybar $USER_CONF/polybar.old || mkdir $USER_CONF/polybar
+    [ -d $USER_CONF/dunst ] && mv $USER_CONF/dunst $USER_CONF/dunst.old || mkdir $USER_CONF/dunst
+    echo 'copying config files'
+    cp -rf .config/* $USER_CONF/
+}
 
-echo 'rebooting'
+conf-theme() {
+    echo 'Configuring Theme'
+    if [ -f /usr/share/gtk-3.0/settings.ini ]; then 
+        sudo sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
+        sudo sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
+        sudo sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
+        sudo sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
+    else
+        echo 'gtk-theme-name = Layan-Dark' >> /usr/share/gtk-3.0/settings.ini
+        echo 'gtk-icon-theme-name = Adwaita' >> /usr/share/gtk-3.0/settings.ini
+        echo 'gtk-cursor-theme-name = Breeze-Hacked' >> /usr/share/gtk-3.0/settings.ini
+        echo 'gtk-font-name = Cantarell 11' >> /usr/share/gtk-3.0/settings.ini
+    fi
+    echo 'Xcursor.theme: Breeze-Hacked' >> ~/.Xresources
+    xrdb ~/.Xresources
+}
 
-systemctl reboot
+conf-dm() {
+    echo 'Configuring Display Manager'
+    echo 'editing config file'
+    sudo sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
+    sudo sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
+    echo 'enabling lightdm'
+    echo '$PASSWORD' | sudo -S systemctl enable --now lightdm
+}
+
+restart() {
+    echo 'rebooting'
+    sleep 3 && systemctl reboot
+}
+
+main() {
+    if [ -f /usr/bin/yay ]; then
+        install-yay
+        install-pacs
+    else
+        echo 'yay is not installed'
+    fi
+    conf-dm
+    conf-theme
+    cong-wm
+    restart
+}
+
+##########
+#Commands#
+##########
+
+if [ &(whoami) == root ]; then
+    sudo-access
+    create-user
+    runas-user
+else
+    check-conf
+    main
+fi

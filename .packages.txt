@@ -1,7 +1,6 @@
 alacritty
 archlinux-xdg-menu
 audacious
-base-devel
 bspwm
 dunst
 feh
