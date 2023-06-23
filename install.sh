@@ -27,7 +27,6 @@ check-conf() {
     if [[ -f $CONFIG_FILE ]]; then
         source $CONFIG_FILE
     else
-        get-user
         get-password
         start
     fi
@@ -71,7 +70,7 @@ set-password() {
 
 runas-user() {
     mkdir $DIR_S
-    cp -r ./* $DIR_S/
+    cp -rf ./* $DIR_S/
     chmod +x $SCRIPT
     chown -R $USERNAME: /home/$USERNAME
     su - $USERNAME -c "/bin/bash $SCRIPT"
@@ -160,7 +159,6 @@ if [[ $(whoami) == 'root' ]]; then
     runas-user
 else
     get-user
-    get-password
     echo "Username=$USERNAME"
     check-conf
     main
