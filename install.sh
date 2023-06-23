@@ -42,13 +42,14 @@ create-user() {
     echo -ne "\n"
     useradd -mG wheel -s /bin/bash $USERNAME
     userhome-var
+    mkdir $DIR_S
+    echo "USERNAME=$USERNAME" >> $CONFIG_FILE
 }
 
 userhome-var() {
     DIR_S=/home/$USERNAME/bspwm-arch
-    CONFIG_FILE=/home/$USERNAME/bspwm-arch/config.txt
+    CONFIG_FILE=/home/$USERNAME/bspwm-arch/.config.txt
     SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
-    echo "USERNAME=$USERNAME" >> $CONFIG_FILE
 }
 
 get-password() {
@@ -69,10 +70,8 @@ set-password() {
 }
 
 runas-user() {
-    mkdir $DIR_S
     cp -rf ./* $DIR_S/
     chmod +x $SCRIPT
-    chown -R $USERNAME: /home/$USERNAME
     su - $USERNAME -c "/bin/bash $SCRIPT"
 }
 
