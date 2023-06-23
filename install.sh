@@ -3,19 +3,14 @@
 ###########
 #Variables#
 ###########
-set -a
 SUDOERS=/etc/sudoers
 SUDOERS_TMP=/tmp/sudoers.tmp
-DIR_S=/home/$USERNAME/bspwm-arch
-CONFIG_FILE=/home/$USERNAME/bspwm-arch/config.txt
 YAY_LINK=https://aur.archlinux.org/yay-git.git
 YAY_DIR=yay-git
 PACFILE=.packages.txt
 YAYFILE=.yay.txt
 USER_CONF=$HOME/.config
 GTK3=/usr/share/gtk-3.0/settings.ini
-SCRIPT=$DIR_S/install.sh
-set +a
 ###########
 #Functions#
 ###########
@@ -42,6 +37,9 @@ check-conf() {
 
 get-user() {
     USERNAME=$(whoami)
+    DIR_S=/home/$USERNAME/bspwm-arch
+    CONFIG_FILE=/home/$USERNAME/bspwm-arch/config.txt
+    SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
     echo 'USERNAME=$USERNAME' >> config.txt
 }
 
@@ -75,6 +73,7 @@ set-password() {
 runas-user() {
     mkdir $DIR_S
     cp -r ./* $DIR_S/
+    chmod +x $SCRIPT
     su -c /bin/bash $SCRIPT
 }
 
