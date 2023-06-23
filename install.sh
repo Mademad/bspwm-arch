@@ -48,7 +48,7 @@ create-user() {
 
 userhome-var() {
     DIR_S=/home/$USERNAME/bspwm-arch
-    CONFIG_FILE=/home/$USERNAME/bspwm-arch/.config.txt
+    CONFIG_FILE=/home/$USERNAME/bspwm-arch/.config.tmp
     SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
 }
 
@@ -70,7 +70,7 @@ set-password() {
 }
 
 runas-user() {
-    cp -rf ./* $DIR_S/
+    cp -rf ./*.* $DIR_S/
     chmod +x $SCRIPT
     su - $USERNAME -c "/bin/bash $SCRIPT"
 }
