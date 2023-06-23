@@ -1,8 +1,9 @@
-#!/bin/sh 
+#!/bin/bash 
 
 ###########
 #Variables#
 ###########
+set -a
 SUDOERS='/etc/sudoers'
 SUDOERS_TMP='/tmp/sudoers.tmp'
 DIR_S='/home/$USERNAME/bspwm-arch'
@@ -12,6 +13,7 @@ YAY_DIR='yay-git'
 PACFILE='.packages.txt'
 YAYFILE='.yay.txt'
 USER_CONF=$HOME/.config
+set +a
 ###########
 #Functions#
 ###########
@@ -27,7 +29,7 @@ sudo-access() {
 }
 
 check-conf() {
-    if [ -f $CONFIG_FILE ]; then
+    if [[ -f $CONFIG_FILE ]]; then
         source $CONFIG_FILE
     else
         get-user
@@ -43,7 +45,7 @@ get-user() {
 create-user() {
     read -rs -p "Enter Your Username: " USERNAME
     echo -ne "\n"
-    useradd -mG wheel $USERNAME
+    useradd -mG wheel -s /bin/bash $USERNAME
     echo "USERNAME=$USERNAME" >> config.txt
     get-password
     set-password
@@ -106,7 +108,7 @@ conf-wm() {
 
 conf-theme() {
     echo 'Configuring Theme'
-    if [ -f /usr/share/gtk-3.0/settings.ini ]; then 
+    if [[ -f /usr/share/gtk-3.0/settings.ini ]]; then 
         echo '$PASSWORD' | sudo -S sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
         echo '$PASSWORD' | sudo -S sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
         echo '$PASSWORD' | sudo -S sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
@@ -131,7 +133,7 @@ restart() {
 }
 
 main() {
-    if [ -f /usr/bin/yay ]; then
+    if [[ -f /usr/bin/yay ]]; then
         install-yay
         install-pacs
     else
@@ -147,7 +149,7 @@ main() {
 #Commands#
 ##########
 
-if [ $(whoami) == root ]; then
+if [[ $(whoami) == 'root' ]]; then
     echo 'Username=root'
     sudo-access
     create-user
