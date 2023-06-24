@@ -179,16 +179,7 @@ restart() {
     sleep 3 && systemctl reboot
 }
 
-start() {
-if [[ $(whoami) = 'root' ]]; then
-    echo 'Username=root'
-    sudo-nopass
-    conf-pacman
-    create-user
-    get-password
-    set-password
-    runas-user
-else
+user-install() {
     USERNAME=$(whoami)
     userhome-var
     check-pass-var
@@ -199,6 +190,19 @@ else
     cong-wm
     sudo-withpass
     sudo-nopass-reverse
+}
+
+start() {
+if [[ $(whoami) = 'root' ]]; then
+    echo 'Username=root'
+    sudo-nopass
+    conf-pacman
+    create-user
+    get-password
+    set-password
+    runas-user
+else
+    user-install
 fi
 }
 start
