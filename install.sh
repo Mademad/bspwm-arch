@@ -193,7 +193,7 @@ else
     userhome-var
     check-pass-var
     echo "Username=$USERNAME"
-    main
+    install-pacs
     conf-dm
     conf-theme
     cong-wm
