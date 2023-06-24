@@ -1,5 +1,6 @@
 brave-bin
 breeze-hacked-cursor-theme
+layan-gtk-theme-git
 otf-font-awesome
 ttf-font-awesome
 xdman

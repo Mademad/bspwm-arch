@@ -22,19 +22,16 @@ userhome-var() {
     PACS=/home/$USERNAME/bspwm-arch/packages.txt
     YAYS=/home/$USERNAME/bspwm-arch/yay.txt
 }
+
+check-pass-var() {
+    if [[ -z $PASSWORD1 ]]; then
+        get-password
+        start
+    fi
+}
 ################
 #Functions-Sudo#
 ################
-sudo-withpass() {
-    SUDOERS=/etc/sudoers
-    SUDOERS_TMP=/tmp/sudoers.tmp
-    echo 'Editing /etc/sudoers For User (root) Access'
-    cp $SUDOERS $SUDOERS_TMP
-    sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' $SUDOERS_TMP
-    cp $SUDOERS_TMP $SUDOERS
-    rm $SUDOERS_TMP
-}
-
 sudo-nopass() {
     SUDOERS=/etc/sudoers
     SUDOERS_TMP=/tmp/sudoers.tmp
@@ -51,6 +48,16 @@ sudo-nopass-reverse() {
     echo 'Editing /etc/sudoers to Reverse User nopassword (root) Access'
     cp $SUDOERS $SUDOERS_TMP
     sed -i 's/^%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' $SUDOERS_TMP
+    cp $SUDOERS_TMP $SUDOERS
+    rm $SUDOERS_TMP
+}
+
+sudo-withpass() {
+    SUDOERS=/etc/sudoers
+    SUDOERS_TMP=/tmp/sudoers.tmp
+    echo 'Editing /etc/sudoers For User (root) Access'
+    cp $SUDOERS $SUDOERS_TMP
+    sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' $SUDOERS_TMP
     cp $SUDOERS_TMP $SUDOERS
     rm $SUDOERS_TMP
 }
@@ -75,9 +82,7 @@ get-password() {
     echo -ne "\n"
     read -rs -p "Please re-enter password: " PASSWORD2
     echo -ne "\n"
-    if [[ "$PASSWORD1" == "$PASSWORD2" ]]; then
-        echo ""PASSWORD=$PASSWORD1"" >> $CONFIG_FILE
-    else
+    if [[ ! "$PASSWORD1" == "$PASSWORD2" ]]; then
         echo -ne "ERROR! Passwords do not match. \n"
         get-password
     fi
@@ -89,15 +94,6 @@ set-password() {
 ###########
 #Configure#
 ###########
-check-conf() {
-    if [[ -f $CONFIG_FILE ]]; then
-        source $CONFIG_FILE
-    else
-        get-password
-        start
-    fi
-}
-
 conf-pacman() {
     PACCONF=/etc/pacman.conf
     sed -i 's/^#ParallelDownloads/ParallelDownloads/g' $PACCONF
@@ -115,6 +111,21 @@ runas-user() {
 ################
 #Functions-Main#
 ################
+install-pacs() {
+    if [[ -f /usr/bin/yay ]]; then
+        echo 'Installing Packages'
+        sudo pacman -Syu --noconfirm --needed - < $PACS
+        yay -S --noconfirm - < $YAYS
+    else
+        echo 'yay is not installed'
+        install-yay
+        if [ $YAYTRYINSTALL = 1 ]; then
+            echo -e "Failed to install yay,\nDo it manually and then try again"
+            exit
+        fi
+        install-pacs
+    fi    
+}
 
 install-yay() {
     echo 'Installing yay'
@@ -124,13 +135,8 @@ install-yay() {
     makepkg -si --noconfirm
     cd ..
     sleep 2
+    YAYTRYINSTALL=1
     rm -rf yay
-}
-
-install-pacs() {
-    echo 'Installing Packages'
-    sudo pacman -Syu --noconfirm --needed - < $PACS
-    yay -S --noconfirm - < $YAYS
 }
 
 conf-wm() {
@@ -173,20 +179,6 @@ restart() {
     sleep 3 && systemctl reboot
 }
 
-main() {
-    if [[ -f /usr/bin/yay ]]; then
-        install-pacs
-    else
-        echo 'yay is not installed'
-        install-yay
-        main
-    fi
-    conf-dm
-    conf-theme
-    cong-wm
-    sudo-nopass-reverse
-}
-
 start() {
 if [[ $(whoami) = 'root' ]]; then
     echo 'Username=root'
@@ -199,9 +191,14 @@ if [[ $(whoami) = 'root' ]]; then
 else
     USERNAME=$(whoami)
     userhome-var
-    check-conf
+    check-pass-var
     echo "Username=$USERNAME"
     main
+    conf-dm
+    conf-theme
+    cong-wm
+    sudo-withpass
+    sudo-nopass-reverse
 fi
 }
 start
