@@ -1,12 +1,8 @@
-#!/usr/bin/env bash 
+#!/usr/bin/bash 
 
 ###########
 #Variables#
 ###########
-SUDOERS=/etc/sudoers
-SUDOERS_TMP=/tmp/sudoers.tmp
-YAY_LINK=https://aur.archlinux.org/yay-git.git
-YAY_DIR=yay-git
 USER_CONF=$HOME/.config
 GTK3=/usr/share/gtk-3.0/settings.ini
 ###########
@@ -27,9 +23,11 @@ userhome-var() {
     YAYS=/home/$USERNAME/bspwm-arch/yay.txt
 }
 ################
-#Functions-User#
+#Functions-Sudo#
 ################
-sudo-access() {
+sudo-withpass() {
+    SUDOERS=/etc/sudoers
+    SUDOERS_TMP=/tmp/sudoers.tmp
     echo 'Editing /etc/sudoers For User (root) Access'
     cp $SUDOERS $SUDOERS_TMP
     sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' $SUDOERS_TMP
@@ -37,16 +35,28 @@ sudo-access() {
     rm $SUDOERS_TMP
 }
 
-check-conf() {
-    if [[ -f $CONFIG_FILE ]]; then
-        source $CONFIG_FILE
-    else
-        get-user
-        get-password
-        start
-    fi
+sudo-nopass() {
+    SUDOERS=/etc/sudoers
+    SUDOERS_TMP=/tmp/sudoers.tmp
+    echo 'Editing /etc/sudoers For User nopassword (root) Access'
+    cp $SUDOERS $SUDOERS_TMP
+    sed -i 's/^# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' $SUDOERS_TMP
+    cp $SUDOERS_TMP $SUDOERS
+    rm $SUDOERS_TMP
 }
 
+sudo-nopass-reverse() {
+    SUDOERS=/etc/sudoers
+    SUDOERS_TMP=/tmp/sudoers.tmp
+    echo 'Editing /etc/sudoers to Reverse User nopassword (root) Access'
+    cp $SUDOERS $SUDOERS_TMP
+    sed -i 's/^%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' $SUDOERS_TMP
+    cp $SUDOERS_TMP $SUDOERS
+    rm $SUDOERS_TMP
+}
+################
+#Functions-User#
+################
 get-user() {
     USERNAME=$(whoami)
     userhome-var
@@ -58,7 +68,6 @@ create-user() {
     useradd -mG wheel -s /bin/bash $USERNAME
     userhome-var
     mkdir $DIR_S
-    echo "USERNAME=$USERNAME" >> $CONFIG_FILE
 }
 
 get-password() {
@@ -77,12 +86,29 @@ get-password() {
 set-password() {
     echo "$USERNAME:$PASSWORD1" | chpasswd
 }
+###########
+#Configure#
+###########
+check-conf() {
+    if [[ -f $CONFIG_FILE ]]; then
+        source $CONFIG_FILE
+    else
+        get-password
+        start
+    fi
+}
+
+conf-pacman() {
+    PACCONF=/etc/pacman.conf
+    sed -i 's/^#ParallelDownloads/ParallelDownloads/g' $PACCONF
+    sed -i "/\[multilib\]/,/Include/"'s/^#//' $PACCONF
+
+}
 
 runas-user() {
     mkdir $DIR_S/.config
     cp -rf ./* $DIR_S/
     cp -rf .config/* $DIR_S/.config/
-    chmod +x $SCRIPT
     su $USERNAME -c "bash $SCRIPT"
 }
 
@@ -92,16 +118,18 @@ runas-user() {
 
 install-yay() {
     echo 'Installing yay'
-    git clone $YAY_LINK
-    cd $YAY_DIR
+    rm -rf yay
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
     makepkg -si --noconfirm
-    sleep 1 && cd ..
-    rm -rf yay-git
+    cd ..
+    sleep 2
+    rm -rf yay
 }
 
 install-pacs() {
     echo 'Installing Packages'
-    echo "$PASSWORD" | sudo -S pacman -Syu --noconfirm --needed - < $PACS
+    sudo pacman -Syu --noconfirm --needed - < $PACS
     yay -S --noconfirm - < $YAYS
 }
 
@@ -122,10 +150,10 @@ conf-wm() {
 conf-theme() {
     echo 'Configuring Theme'
     if [[ -f $GTK3 ]]; then 
-        echo "$PASSWORD" | sudo -S sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
-        echo "$PASSWORD" | sudo -S sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
-        echo "$PASSWORD" | sudo -S sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
-        echo "$PASSWORD" | sudo -S sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
+        sudo sed -i 's/gtk-theme-name =*/gtk-theme-name = Layan-Dark/g' /usr/share/gtk-3.0/settings.ini
+        sudo sed -i 's/gtk-icon-theme-name =*/gtk-icon-theme-name = Adwaita/g' /usr/share/gtk-3.0/settings.ini
+        sudo sed -i 's/gtk-cursor-theme-name =*/gtk-cursor-theme-name = Breeze-Hacked/g' /usr/share/gtk-3.0/settings.ini
+        sudo sed -i 's/gtk-font-name =*/gtk-font-name = Cantarell 11/g' /usr/share/gtk-3.0/settings.ini
     fi
     echo 'Xcursor.theme: Breeze-Hacked' >> ~/.Xresources
     xrdb ~/.Xresources
@@ -134,10 +162,10 @@ conf-theme() {
 conf-dm() {
     echo 'Configuring Display Manager'
     echo 'editing config file'
-    echo "$PASSWORD" | sudo -S sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
-    echo "$PASSWORD" | sudo -S sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
+    sudo sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
+    sudo sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
     echo 'Enabling Display Manager'
-    echo "$PASSWORD" | sudo -S systemctl enable --now lightdm
+    sudo systemctl enable --now lightdm
 }
 
 restart() {
@@ -156,13 +184,14 @@ main() {
     conf-dm
     conf-theme
     cong-wm
-    restart
+    sudo-nopass-reverse
 }
 
 start() {
-if [[ $(whoami) == 'root' ]]; then
+if [[ $(whoami) = 'root' ]]; then
     echo 'Username=root'
-    sudo-access
+    sudo-nopass
+    conf-pacman
     create-user
     get-password
     set-password
