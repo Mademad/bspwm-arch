@@ -1,9 +1,8 @@
-#!/usr/bin/bash 
+#!/bin/bash 
 
 ###########
 #Variables#
 ###########
-USER_CONF=$HOME/.config
 GTK3=/usr/share/gtk-3.0/settings.ini
 ###########
 #Functions#
@@ -16,6 +15,7 @@ set_option() {
 }
 
 userhome-var() {
+    USER_CONF=/home/$USERNAME/.config
     DIR_S=/home/$USERNAME/bspwm-arch
     CONFIG_FILE=/home/$USERNAME/bspwm-arch/setup.conf
     SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
@@ -24,11 +24,8 @@ userhome-var() {
 }
 
 check-pass-var() {
-    if [[ -z $PASSWORD1 ]]; then
-        get-password
-        start
-    fi
-}
+    if [[ "x$PASSWORD1" = "$PASSWORD1" ]]; then get-password; fi
+    }
 ################
 #Functions-Sudo#
 ################
@@ -98,45 +95,7 @@ conf-pacman() {
     PACCONF=/etc/pacman.conf
     sed -i 's/^#ParallelDownloads/ParallelDownloads/g' $PACCONF
     sed -i "/\[multilib\]/,/Include/"'s/^#//' $PACCONF
-
-}
-
-runas-user() {
-    mkdir $DIR_S/.config
-    cp -rf ./* $DIR_S/
-    cp -rf .config/* $DIR_S/.config/
-    su $USERNAME -c "bash $SCRIPT"
-}
-
-################
-#Functions-Main#
-################
-install-pacs() {
-    if [[ -f /usr/bin/yay ]]; then
-        echo 'Installing Packages'
-        sudo pacman -Syu --noconfirm --needed - < $PACS
-        yay -S --noconfirm - < $YAYS
-    else
-        echo 'yay is not installed'
-        install-yay
-        if [ $YAYTRYINSTALL = 1 ]; then
-            echo -e "Failed to install yay,\nDo it manually and then try again"
-            exit
-        fi
-        install-pacs
-    fi    
-}
-
-install-yay() {
-    echo 'Installing yay'
-    rm -rf yay
-    git clone https://aur.archlinux.org/yay.git
-    cd yay
-    makepkg -si --noconfirm
-    cd ..
-    sleep 2
-    YAYTRYINSTALL=1
-    rm -rf yay
+    pacman -Sy
 }
 
 conf-wm() {
@@ -174,6 +133,45 @@ conf-dm() {
     sudo systemctl enable --now lightdm
 }
 
+runas-user() {
+    cd 
+    mkdir $DIR_S/.config
+    cp -rf ./* $DIR_S/
+    cp -rf .config/* $DIR_S/.config/
+    su $USERNAME -c "bash $SCRIPT"
+}
+
+################
+#Functions-Main#
+################
+install-pacs() {
+    if [[ -f /usr/bin/yay ]]; then
+        echo 'Installing Packages'
+        sudo pacman -Syu --noconfirm --needed - < $PACS
+        yay -S --noconfirm - < $YAYS
+    else
+        echo 'yay is not installed'
+        install-yay
+        if [ $YAYTRYINSTALL = 1 ]; then
+            echo -e "Failed to install yay,\nDo it manually and then try again"
+            exit
+        fi
+        install-pacs
+    fi    
+}
+
+install-yay() {
+    echo 'Installing yay'
+    rm -rf yay
+    git clone https://aur.archlinux.org/yay.git
+    cd yay
+    makepkg -si --noconfirm
+    cd ..
+    sleep 2
+    YAYTRYINSTALL=1
+    rm -rf yay
+}
+
 restart() {
     echo 'rebooting'
     sleep 3 && systemctl reboot
@@ -202,6 +200,7 @@ if [[ $(whoami) = 'root' ]]; then
     set-password
     runas-user
 else
+    cd $HOME
     user-install
 fi
 }
