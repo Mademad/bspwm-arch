@@ -211,7 +211,6 @@ if [[ $(whoami) = 'root' ]]; then
     set-password
     runas-user
 else
-    cd $HOME
     user-install
 fi
 }
