@@ -145,6 +145,15 @@ runas-user() {
 #Functions-Main#
 ################
 install-pacs() {
+    if [ -f /var/lib/pacman/db.lck ]; then
+        rm -rf /var/lib/pacman/db.lck
+        if [ $PACLOCK = 1 ]; then 
+            echo "Unable to Unlock pacman database"
+            exit
+        fi
+        PACLOCK=1
+        install-pacs
+    fi 
     if [[ -f /usr/bin/yay ]]; then
         echo 'Installing Packages'
         sudo pacman -Syu --noconfirm --needed - < $PACS
