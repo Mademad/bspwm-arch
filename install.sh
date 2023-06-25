@@ -4,6 +4,8 @@
 #Variables#
 ###########
 GTK3=/usr/share/gtk-3.0/settings.ini
+SUDOERS=/etc/sudoers
+SUDOERS_TMP=/tmp/sudoers.tmp
 ###########
 #Functions#
 ###########
@@ -31,9 +33,7 @@ check-pass-var() {
 #Functions-Sudo#
 ################
 sudo-nopass() {
-    SUDOERS=/etc/sudoers
-    SUDOERS_TMP=/tmp/sudoers.tmp
-    echo 'Editing /etc/sudoers For User nopassword (root) Access'
+    echo 'Editing /etc/sudoers For nopassword User (root) Access'
     cp $SUDOERS $SUDOERS_TMP
     sed -i 's/^# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/%wheel ALL=(ALL:ALL) NOPASSWD: ALL/' $SUDOERS_TMP
     cp $SUDOERS_TMP $SUDOERS
@@ -41,23 +41,19 @@ sudo-nopass() {
 }
 
 sudo-nopass-reverse() {
-    SUDOERS=/etc/sudoers
-    SUDOERS_TMP=/tmp/sudoers.tmp
-    echo 'Editing /etc/sudoers to Reverse User nopassword (root) Access'
-    cp $SUDOERS $SUDOERS_TMP
-    sed -i 's/^%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' $SUDOERS_TMP
-    cp $SUDOERS_TMP $SUDOERS
-    rm $SUDOERS_TMP
+    echo 'Editing /etc/sudoers to Reverse nopassword User (root) Access'
+    sudo cp $SUDOERS $SUDOERS_TMP
+    sudo sed -i 's/^%wheel ALL=(ALL:ALL) NOPASSWD: ALL/# %wheel ALL=(ALL:ALL) NOPASSWD: ALL/' $SUDOERS_TMP
+    sudo cp $SUDOERS_TMP $SUDOERS
+    sudo rm $SUDOERS_TMP
 }
 
 sudo-withpass() {
-    SUDOERS=/etc/sudoers
-    SUDOERS_TMP=/tmp/sudoers.tmp
     echo 'Editing /etc/sudoers For User (root) Access'
-    cp $SUDOERS $SUDOERS_TMP
-    sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' $SUDOERS_TMP
-    cp $SUDOERS_TMP $SUDOERS
-    rm $SUDOERS_TMP
+    sudo cp $SUDOERS $SUDOERS_TMP
+    sudo sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' $SUDOERS_TMP
+    sudo cp $SUDOERS_TMP $SUDOERS
+    sudo rm $SUDOERS_TMP
 }
 ################
 #Functions-User#
