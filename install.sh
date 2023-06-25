@@ -88,11 +88,26 @@ set-password() {
 ###########
 #Configure#
 ###########
+qqqqqqqqq() {
+    pacman -Sy --noconfirm --needed pacman-contrib terminus-font curl reflector rsync
+    setfont ter-v16b
+    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+    iso=$(curl -4 ifconfig.co/country-iso)
+    timedatectl set-ntp true
+    reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
+}
+
 conf-pacman() {
     PACCONF=/etc/pacman.conf
     sed -i 's/^#ParallelDownloads/ParallelDownloads/g' $PACCONF
     sed -i "/\[multilib\]/,/Include/"'s/^#//' $PACCONF
-    pacman -Sy
+    pacman -Sy --noconfirm --needed pacman-contrib terminus-font
+    setfont ter-v16b
+    pacman -S --noconfirm --needed curl reflector rsync
+    cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+    iso=$(curl -4 ifconfig.co/country-iso)
+    timedatectl set-ntp true
+    reflector -a 48 -c $iso -f 5 -l 20 --sort rate --save /etc/pacman.d/mirrorlist
 }
 
 conf-wm() {
