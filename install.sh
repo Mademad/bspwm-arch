@@ -16,6 +16,7 @@ set_option() {
 
 userhome-var() {
     USER_CONF=/home/$USERNAME/.config
+    DIR_U=/home/$USERNAME
     DIR_S=/home/$USERNAME/bspwm-arch
     CONFIG_FILE=/home/$USERNAME/bspwm-arch/setup.conf
     SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
@@ -134,9 +135,10 @@ conf-dm() {
 }
 
 runas-user() {
-    cd 
-    mkdir $DIR_S/.config
+    if [ -d $DIR_S ]; then rm -rf $DIR_S; fi
+    mkdir $DIR_S
     cp -rf ./* $DIR_S/
+    mkdir $DIR_S/.config
     cp -rf .config/* $DIR_S/.config/
     su $USERNAME -c "bash $SCRIPT"
 }
