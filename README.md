@@ -1,4 +1,4 @@
-## My BSPWM Configs
+## Still Incomplete
 
 ## For Fresh Installs
 
