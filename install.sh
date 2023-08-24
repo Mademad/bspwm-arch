@@ -196,7 +196,7 @@ user-install() {
     install-pacs
     conf-dm
     conf-theme
-    cong-wm
+    conf-wm
     sudo-withpass
     sudo-nopass-reverse
 }
