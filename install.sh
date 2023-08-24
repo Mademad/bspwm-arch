@@ -138,10 +138,8 @@ conf-dm() {
 
 runas-user() {
     if [ -d $DIR_S ]; then rm -rf $DIR_S; fi
-    mkdir $DIR_S
-    cp -rf ./* $DIR_S/
-    mkdir $DIR_S/.config
-    cp -rf .config/* $DIR_S/.config/
+    cd $DIR_U
+    su $USERNAME -c "git clone https://github.com/Mademad/bspwm-arch"
     su $USERNAME -c "bash $SCRIPT"
 }
 
