@@ -27,7 +27,13 @@ userhome-var() {
 }
 
 check-pass-var() {
-    if [[ "x$PASSWORD1" = "$PASSWORD1" ]]; then get-password; fi
+    if [[ -z "$PASSWORD1" ]]; then
+        echo "Password needed."
+        get-password
+    elif [[ "$PASSWORD1" -ne "$PASSWORD2" ]]; then
+        echo "Entered Passwords Do Not Match"
+        get-password
+    fi
     }
 ################
 #Functions-Sudo#
@@ -112,7 +118,7 @@ conf-wm() {
     [ -d $USER_CONF/polybar ] && mv $USER_CONF/polybar $USER_CONF/polybar.old || mkdir $USER_CONF/polybar
     [ -d $USER_CONF/dunst ] && mv $USER_CONF/dunst $USER_CONF/dunst.old || mkdir $USER_CONF/dunst
     echo 'copying config files'
-    cp -rf .config/* $USER_CONF/
+    cp -arf .config/* $USER_CONF/
 }
 
 conf-theme() {
@@ -133,7 +139,7 @@ conf-dm() {
     sudo sed -i 's/#greeter-session=example-gtk-gnome/greeter-session=lightdm-slick-greeter/g' /etc/lightdm/lightdm.conf
     sudo sed -i 's/#user-session=default/user-session=bspwm/g' /etc/lightdm/lightdm.conf
     echo 'Enabling Display Manager'
-    sudo systemctl enable --now lightdm
+    sudo systemctl enable lightdm
 }
 
 runas-user() {
