@@ -133,7 +133,8 @@ conf-dm() {
 }
 
 runas-user() {
-    su $USERNAME -c "git clone https://github.com/Mademad/bspwm-arch"
+    su $USERNAME -c "cd && sudo rm -r bspwm-arch"
+    su $USERNAME -c "cd && git clone https://github.com/Mademad/bspwm-arch && cd bspwm-arch && bash install.sh"
     su $USERNAME -c "bash $SCRIPT"
 }
 
@@ -170,10 +171,9 @@ install-yay() {
     rm -rf yay
     git clone https://aur.archlinux.org/yay.git
     cd yay
-    makepkg -si --noconfirm
+    makepkg -si --noconfirm && YAYTRYINSTALL=0 || YAYTRYINSTALL=1
     cd ..
-    sleep 2
-    YAYTRYINSTALL=1
+    sleep 5
     rm -rf yay
 }
 
