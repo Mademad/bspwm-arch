@@ -6,6 +6,13 @@
 GTK3=/usr/share/gtk-3.0/settings.ini
 SUDOERS=/etc/sudoers
 SUDOERS_TMP=/tmp/sudoers.tmp
+PACCONF=/etc/pacman.conf
+USER_CONF=$HOME/.config
+DIR_U=$HOME
+DIR_S=$HOME/bspwm-arch
+SCRIPT=$HOME/bspwm-arch/install.sh
+PACS=$HOME/bspwm-arch/packages.txt
+YAYS=$HOME/bspwm-arch/yay.txt
 ###########
 #Functions#
 ###########
@@ -14,16 +21,6 @@ set_option() {
         sed -i -e "/^${1}.*/d" $CONFIG_FILE # delete option if exists
     fi
     echo "${1}=${2}" >>$CONFIG_FILE # add option
-}
-
-userhome-var() {
-    USER_CONF=/home/$USERNAME/.config
-    DIR_U=/home/$USERNAME
-    DIR_S=/home/$USERNAME/bspwm-arch
-    CONFIG_FILE=/home/$USERNAME/bspwm-arch/setup.conf
-    SCRIPT=/home/$USERNAME/bspwm-arch/install.sh
-    PACS=/home/$USERNAME/bspwm-arch/packages.txt
-    YAYS=/home/$USERNAME/bspwm-arch/yay.txt
 }
 
 check-pass-var() {
@@ -95,7 +92,6 @@ set-password() {
 #Configure#
 ###########
 conf-pacman() {
-    PACCONF=/etc/pacman.conf
     sed -i 's/^#ParallelDownloads/ParallelDownloads/g' $PACCONF
     sed -i "/\[multilib\]/,/Include/"'s/^#//' $PACCONF
     pacman -Sy --noconfirm --needed pacman-contrib terminus-font
@@ -196,7 +192,6 @@ restart() {
 
 user-install() {
     USERNAME=$(whoami)
-    userhome-var
     check-pass-var
     echo "Username=$USERNAME"
     install-pacs
@@ -220,4 +215,5 @@ else
     user-install
 fi
 }
+"$@"
 start
