@@ -61,16 +61,10 @@ sudo-withpass() {
 ################
 #Functions-User#
 ################
-get-user() {
-    USERNAME=$(whoami)
-    userhome-var
-}
-
 create-user() {
     read -rs -p "Enter Your Username: " USERNAME
     echo -ne "\n"
     useradd -mG wheel -s /bin/bash $USERNAME
-    userhome-var
     mkdir $DIR_S
 }
 
@@ -139,8 +133,6 @@ conf-dm() {
 }
 
 runas-user() {
-    if [ -d $DIR_S ]; then rm -rf $DIR_S; fi
-    cd $DIR_U
     su $USERNAME -c "git clone https://github.com/Mademad/bspwm-arch"
     su $USERNAME -c "bash $SCRIPT"
 }
@@ -212,8 +204,10 @@ if [[ $(whoami) = 'root' ]]; then
     set-password
     runas-user
 else
+    USERNAME=$(whoami)
     user-install
 fi
 }
 "$@"
+cd
 start
