@@ -108,7 +108,13 @@ conf-wm() {
     [ -d $USER_CONF/polybar ] && mv $USER_CONF/polybar $USER_CONF/polybar.old
     [ -d $USER_CONF/dunst ] && mv $USER_CONF/dunst $USER_CONF/dunst.old
     echo 'copying config files'
-    cp -arf .config/* $USER_CONF/
+    cp -arf bspwm-arch/.config/* .config/
+    echo 'making necessary files executable'
+    chmod +x .config/bspwm/bspwmrc
+    chmod +x .config/bspwm/scripts/lock.sh
+    chmod +x .config/sxhkd/sxhkdrc
+    chmod +x .config/polybar/launch.sh
+    chmod +x .config/dunst/dunstrc
 }
 
 conf-theme() {
