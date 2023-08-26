@@ -1,4 +1,5 @@
 ## Still Incomplete
+all that's left is to get the theming just right
 
 ## For Fresh Installs
 
