@@ -1,5 +1,6 @@
 ## Still Incomplete
 all that's left is to get the theming just right
+and clean up the script
 
 ## For Fresh Installs
 
