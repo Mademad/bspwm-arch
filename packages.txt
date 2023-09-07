@@ -4,6 +4,7 @@ audacious
 bspwm
 dunst
 feh
+ffmpegthumbnailer
 file-roller
 freerdp
 grub
